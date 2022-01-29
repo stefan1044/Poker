@@ -34,42 +34,139 @@ class Poker:
 
     @staticmethod
     def verificaChintaDeCuloare(carti):
-        
-        
-        
-        pass
+        vectFrecvCulori = {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
+        vectValori = []
+        culoare = 0
+
+        for iterator in carti:
+            if iterator[0] == "inima" or "romb" or "frunza" or "trefla" and iterator[1] != 14:
+                vectFrecvCulori[iterator[0]] += 1
+
+        for (it1, it2) in vectFrecvCulori.items():
+            if it2 > 4:
+                culoare = it1
+        if culoare == 0:
+            return None
+
+        for iterator in carti:
+            if iterator[0] is culoare:
+                vectValori.append(iterator[1])
+        vectValori.sort()
+
+        for i in range(len(vectValori) - 1, 3, -1):
+            if vectValori[i-1] == vectValori[i]-1 and vectValori[i-2] == vectValori[i]-2 and vectValori[i-3] == vectValori[i]-3 and vectValori[i-4] == vectValori[i]-4:
+                return (vectValori[i], "ChintaDeCuloare")
 
     @staticmethod
     def verificaCareu(carti):
-        pass
+        vectFrecv = [0]*15
+
+        for iterator in carti:
+            vectFrecv[iterator[1]] += 1
+
+        if vectFrecv.count(4):
+            return (vectFrecv.index(4), "Careu")
 
     @staticmethod
     def verificaFullHouse(carti):
-        pass
+        vectFrecv = [0]*15
+        trei = None
+        doi = None
+
+        for iterator in carti:
+            vectFrecv[iterator[1]] += 1
+        vectFrecv[1] = 0
+
+        for i in range(len(vectFrecv)-1, -1, -1):
+            if vectFrecv[i] == 3:
+                trei = i
+                break
+        if trei is None:
+            return
+
+        for i in range(len(vectFrecv)-1, -1, -1):
+            if vectFrecv[i] == 2:
+                doi = i
+                break
+        if doi is None:
+            return
+
+        return (trei, doi, "FullHouse")
 
     @staticmethod
     def verificaCuloare(carti):
-        pass
+        vectFrecvCulori = {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
+        vectMaxCulori = {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
+
+        for iterator in carti:
+            if iterator[1] != 14:
+                vectFrecvCulori[iterator[0]] += 1
+            if iterator[1] > vectMaxCulori[iterator[0]]:
+                vectMaxCulori[iterator[0]] = iterator[1]
+
+        for (it1, it2) in vectFrecvCulori.items():
+            if it2 > 4:
+                return (vectMaxCulori[it1], "Culoare")
 
     @staticmethod
     def verificaChinta(carti):
-        pass
+        vectValori = []
+
+        for iterator in carti:
+            vectValori.append(iterator[1])
+        vectValori.sort()
+
+        for i in range(len(vectValori) - 1, 3, -1):
+            if vectValori[i-1] == vectValori[i]-1 and vectValori[i-2] == vectValori[i]-2 and vectValori[i-3] == vectValori[i]-3 and vectValori[i-4] == vectValori[i]-4:
+                return (vectValori[i], "Chinta")
 
     @staticmethod
     def verificaCui(carti):
-        pass
+        vectFrecv = [0]*15
+
+        for iterator in carti:
+            vectFrecv[iterator[1]] += 1
+
+        for i in range(len(vectFrecv) - 1, 0, -1):
+            if vectFrecv[i] == 3:
+                return (i, "Cui")
 
     @staticmethod
     def verificaDouaPerechi(carti):
-        pass
+        vectFrecv = [0]*15
+        val1 = None
+
+        for iterator in carti:
+            vectFrecv[iterator[1]] += 1
+        vectFrecv[1] = 0
+
+        if vectFrecv.count(2) < 2:
+            return None
+
+        for i in range(len(vectFrecv)-1, -1, -1):
+            if vectFrecv[i] == 2 and val1 is None:
+                val1 = i
+            elif vectFrecv[i] == 2:
+                return(val1, i, "DouaPerechi")
 
     @staticmethod
     def verificaPereche(carti):
-        pass
+        vectFrecv = [0]*15
 
-    @staticmethod
-    def verificaCarteMare(carti):
-        pass
+        for iterator in carti:
+            vectFrecv[iterator[1]] += 1
+        vectFrecv[1] = 0
+
+        if vectFrecv.count(2) > 0:
+            vectFrecv.reverse()
+            print(vectFrecv)
+            return (abs(vectFrecv.index(2)-14), abs(vectFrecv.index(1)-14), "Pereche")
+
+    def verificaCarteMare(self):
+        if self.carte1[1] > self.carte2[1]:
+            return (self.carte1[1], "CarteMare")
+        else:
+            return (self.carte2[1], "CarteMare")
 
     def manaMaxima(self):
 
@@ -90,21 +187,21 @@ class Poker:
             return Poker.verificaDouaPerechi(manaJucator)
         if Poker.verificaPereche(manaJucator):
             return Poker.verificaPereche(manaJucator)
-        if Poker.verificaCarteMare(manaJucator):
-            return Poker.verificaCarteMare(manaJucator)
+        if self.verificaCarteMare():
+            return self.verificaCarteMare()
 
         print("Nu a gasit mana")
         sys.exit
 
 
-Poker.carteMasa1 = ("inima", 3)
-Poker.carteMasa2 = ("inima", 2)
-Poker.carteMasa3 = ("inima", 6)
-Poker.carteMasa4 = ("frunza", 1)
-Poker.carteMasa5 = ("trefla", 2)
-jucator = Poker("inima", 4, "inima", 5)
+Poker.carteMasa1 = ("trefla", 1)
+Poker.carteMasa2 = ("romb", 9)
+Poker.carteMasa3 = ("romb", 4)
+Poker.carteMasa4 = ("inima", 13)
+Poker.carteMasa5 = ("trefla", 11)
+jucator = Poker("inima", 7, "inima", 5)
 
-lista=jucator.cartiJucator()
-print(lista[5])
+lista = jucator.cartiJucator()
+
 print(jucator.cartiJucator())
 print(jucator.manaMaxima())
