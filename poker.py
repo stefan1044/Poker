@@ -1,4 +1,5 @@
 import sys
+import random
 
 
 class Poker:
@@ -12,9 +13,25 @@ class Poker:
     carte1 = ()
     carte2 = ()
 
+    cartiFolosite = []
+    listaCulori = ["inima", "romb", "trefla", "frunza"]
+
     def __init__(self, culoare1, valoare1, culoare2, valoare2):
         self.carte1 = (culoare1, valoare1)
         self.carte2 = (culoare2, valoare2)
+
+    @staticmethod
+    def alegeCarteRandom():
+
+        while True:
+            valoare = random.randint(1, 13)
+            culoare = random.choice(Poker.listaCulori)
+            if Poker.cartiFolosite.count((culoare, valoare)) == 0:
+                Poker.cartiFolosite.append((culoare, valoare))
+                return (culoare, valoare)
+
+    def reseteazaCartiFolosite():
+        Poker.cartiFolosite.clear()
 
     def cartiJucator(self):
         totalCartiJucator = []
@@ -55,7 +72,7 @@ class Poker:
 
         for i in range(len(vectValori) - 1, 3, -1):
             if vectValori[i-1] == vectValori[i]-1 and vectValori[i-2] == vectValori[i]-2 and vectValori[i-3] == vectValori[i]-3 and vectValori[i-4] == vectValori[i]-4:
-                return (vectValori[i], "ChintaDeCuloare")
+                return (8, vectValori[i], "ChintaDeCuloare")
 
     @staticmethod
     def verificaCareu(carti):
@@ -65,7 +82,7 @@ class Poker:
             vectFrecv[iterator[1]] += 1
 
         if vectFrecv.count(4):
-            return (vectFrecv.index(4), "Careu")
+            return (7, vectFrecv.index(4), "Careu")
 
     @staticmethod
     def verificaFullHouse(carti):
@@ -91,7 +108,7 @@ class Poker:
         if doi is None:
             return
 
-        return (trei, doi, "FullHouse")
+        return (6, trei, doi, "FullHouse")
 
     @staticmethod
     def verificaCuloare(carti):
@@ -106,7 +123,7 @@ class Poker:
 
         for (it1, it2) in vectFrecvCulori.items():
             if it2 > 4:
-                return (vectMaxCulori[it1], "Culoare")
+                return (5, vectMaxCulori[it1], "Culoare")
 
     @staticmethod
     def verificaChinta(carti):
@@ -118,7 +135,7 @@ class Poker:
 
         for i in range(len(vectValori) - 1, 3, -1):
             if vectValori[i-1] == vectValori[i]-1 and vectValori[i-2] == vectValori[i]-2 and vectValori[i-3] == vectValori[i]-3 and vectValori[i-4] == vectValori[i]-4:
-                return (vectValori[i], "Chinta")
+                return (4, vectValori[i], "Chinta")
 
     @staticmethod
     def verificaCui(carti):
@@ -129,7 +146,7 @@ class Poker:
 
         for i in range(len(vectFrecv) - 1, 0, -1):
             if vectFrecv[i] == 3:
-                return (i, "Cui")
+                return (3, i, "Cui")
 
     @staticmethod
     def verificaDouaPerechi(carti):
@@ -147,26 +164,29 @@ class Poker:
             if vectFrecv[i] == 2 and val1 is None:
                 val1 = i
             elif vectFrecv[i] == 2:
-                return(val1, i, "DouaPerechi")
+                return(2, val1, i, "DouaPerechi")
 
-    @staticmethod
-    def verificaPereche(carti):
+    def verificaPereche(self, carti):
         vectFrecv = [0]*15
 
         for iterator in carti:
             vectFrecv[iterator[1]] += 1
         vectFrecv[1] = 0
 
+        if self.carte1[1] > self.carte2[1]:
+            kicker = self.carte1
+        else:
+            kicker = self.carte2
+
         if vectFrecv.count(2) > 0:
             vectFrecv.reverse()
-            print(vectFrecv)
-            return (abs(vectFrecv.index(2)-14), abs(vectFrecv.index(1)-14), "Pereche")
+            return (1, abs(vectFrecv.index(2)-14), kicker[1], "Pereche")
 
     def verificaCarteMare(self):
         if self.carte1[1] > self.carte2[1]:
             return (self.carte1[1], "CarteMare")
         else:
-            return (self.carte2[1], "CarteMare")
+            return (0, self.carte2[1], "CarteMare")
 
     def manaMaxima(self):
 
@@ -185,8 +205,8 @@ class Poker:
             return Poker.verificaCui(manaJucator)
         if Poker.verificaDouaPerechi(manaJucator):
             return Poker.verificaDouaPerechi(manaJucator)
-        if Poker.verificaPereche(manaJucator):
-            return Poker.verificaPereche(manaJucator)
+        if self.verificaPereche(manaJucator):
+            return self.verificaPereche(manaJucator)
         if self.verificaCarteMare():
             return self.verificaCarteMare()
 
@@ -194,14 +214,42 @@ class Poker:
         sys.exit
 
 
-Poker.carteMasa1 = ("trefla", 1)
-Poker.carteMasa2 = ("romb", 9)
-Poker.carteMasa3 = ("romb", 4)
-Poker.carteMasa4 = ("inima", 13)
-Poker.carteMasa5 = ("trefla", 11)
-jucator = Poker("inima", 7, "inima", 5)
+for i in range(1, 30):
+    Poker.carteMasa1 = Poker.alegeCarteRandom()
+    Poker.carteMasa2 = Poker.alegeCarteRandom()
+    Poker.carteMasa3 = Poker.alegeCarteRandom()
+    Poker.carteMasa4 = Poker.alegeCarteRandom()
+    Poker.carteMasa5 = Poker.alegeCarteRandom()
 
-lista = jucator.cartiJucator()
+    cul1, val1 = Poker.alegeCarteRandom()
+    cul2, val2 = Poker.alegeCarteRandom()
+    jucator1 = Poker(cul1, val1, cul2, val2)
 
-print(jucator.cartiJucator())
-print(jucator.manaMaxima())
+    cul1, val1 = Poker.alegeCarteRandom()
+    cul2, val2 = Poker.alegeCarteRandom()
+    jucator2 = Poker(cul1, val1, cul2, val2)
+
+    j1 = jucator1.manaMaxima()
+    j2 = jucator2.manaMaxima()
+    print(f"Carti Masa:{Poker.carteMasa1} {Poker.carteMasa2} {Poker.carteMasa3} {Poker.carteMasa4} {Poker.carteMasa5} \nCarti jucator1: {jucator1.carte1} {jucator1.carte2} \nCarti jucator2: {jucator2.carte1} {jucator2.carte2} \n")
+    print(f"Mana maxima Jucator1:{j1}\nMana maxima Jucator2:{j2}\n")
+
+    Poker.reseteazaCartiFolosite()
+
+
+''' Test Egalitate Random
+totalCuloare= {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
+totalValori=[0]*14
+for i in range (1,100000):
+    Poker.carteMasa1=Poker.alegeCarteRandom()
+    totalCuloare[Poker.carteMasa1[0]]+=1
+    totalValori[Poker.carteMasa1[1]]+=1
+print(f"Inima: {totalCuloare['inima']}\nRomb: {totalCuloare['romb']}\nFrunza: {totalCuloare['frunza']}\nTrefla: {totalCuloare['trefla']}")
+contor=1
+for i in totalValori:
+    print(contor,end="  ")
+    contor+=1
+print('/n')
+for i in totalValori:
+    print(i,end=' ')
+'''
