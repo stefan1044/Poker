@@ -2,8 +2,8 @@ import socket
 import select
 import pickle
 
-IP_ADDRESS="127.0.0.1"
-PORT=1234
+IP_ADDRESS = "127.0.0.1"
+PORT = 1234
 HEADERSIZE = 10
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,6 +18,6 @@ while True:
     d = {1: "Hey", 2: "There"}
     msg = pickle.dumps(d)
 
-    msg = bytes(f"{len(msg):<{HEADERSIZE}}", "utf-8") + msg
+    msg = bytes(f"{len(msg): < {HEADERSIZE}}", "utf-8") + msg
 
     clientsocket.send(msg)

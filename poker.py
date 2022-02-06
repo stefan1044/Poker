@@ -1,8 +1,8 @@
-import sys
 import random
 
 
 class Poker:
+    listaCulori = ["inima", "romb", "trefla", "frunza"]
 
     carteMasa1 = ()
     carteMasa2 = ()
@@ -14,52 +14,46 @@ class Poker:
     carte2 = ()
 
     cartiFolosite = []
-    listaCulori = ["inima", "romb", "trefla", "frunza"]
 
     def __init__(self, culoare1, valoare1, culoare2, valoare2):
         self.carte1 = (culoare1, valoare1)
         self.carte2 = (culoare2, valoare2)
 
     @staticmethod
-    def alegeCarteRandom():
+    def alege_carte_random():
 
         while True:
             valoare = random.randint(1, 13)
             culoare = random.choice(Poker.listaCulori)
             if Poker.cartiFolosite.count((culoare, valoare)) == 0:
                 Poker.cartiFolosite.append((culoare, valoare))
-                return (culoare, valoare)
-
-    def reseteazaCartiFolosite():
-        Poker.cartiFolosite.clear()
-
-    def cartiJucator(self):
-        totalCartiJucator = []
-
-        totalCartiJucator.append(Poker.carteMasa1)
-        totalCartiJucator.append(Poker.carteMasa2)
-        totalCartiJucator.append(Poker.carteMasa3)
-        totalCartiJucator.append(Poker.carteMasa4)
-        totalCartiJucator.append(Poker.carteMasa5)
-        totalCartiJucator.append(self.carte1)
-        totalCartiJucator.append(self.carte2)
-        for iterator in totalCartiJucator:
-            if iterator[1] == 1:
-                totalCartiJucator.append((iterator[0], 14))
-
-        return totalCartiJucator
+                return culoare, valoare
 
     @staticmethod
-    def verificaChintaDeCuloare(carti):
-        vectFrecvCulori = {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
-        vectValori = []
+    def reseteaza_carti_folosite():
+        Poker.cartiFolosite.clear()
+
+    def carti_jucator(self):
+        total_carti_jucator = [Poker.carteMasa1, Poker.carteMasa2, Poker.carteMasa3, Poker.carteMasa4, Poker.carteMasa5,
+                               self.carte1, self.carte2]
+
+        for iterator in total_carti_jucator:
+            if iterator[1] == 1:
+                total_carti_jucator.append((iterator[0], 14))
+
+        return total_carti_jucator
+
+    @staticmethod
+    def verifica_chinta_de_culoare(carti):
+        vect_frecv_culori = {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
+        vect_valori = []
         culoare = 0
 
         for iterator in carti:
             if iterator[0] == "inima" or "romb" or "frunza" or "trefla" and iterator[1] != 14:
-                vectFrecvCulori[iterator[0]] += 1
+                vect_frecv_culori[iterator[0]] += 1
 
-        for (it1, it2) in vectFrecvCulori.items():
+        for (it1, it2) in vect_frecv_culori.items():
             if it2 > 4:
                 culoare = it1
         if culoare == 0:
@@ -67,189 +61,319 @@ class Poker:
 
         for iterator in carti:
             if iterator[0] is culoare:
-                vectValori.append(iterator[1])
-        vectValori.sort()
+                vect_valori.append(iterator[1])
+        vect_valori.sort()
 
-        for i in range(len(vectValori) - 1, 3, -1):
-            if vectValori[i-1] == vectValori[i]-1 and vectValori[i-2] == vectValori[i]-2 and vectValori[i-3] == vectValori[i]-3 and vectValori[i-4] == vectValori[i]-4:
-                return (8, vectValori[i], "ChintaDeCuloare")
+        for index in range(len(vect_valori) - 1, 3, -1):
+            if vect_valori[index - 1] == vect_valori[index] - 1 and \
+                    vect_valori[index - 2] == vect_valori[index] - 2 and vect_valori[index - 3] == \
+                    vect_valori[index] - 3 and vect_valori[index - 4] == vect_valori[index] - 4:
+                return 8, vect_valori[index], "ChintaDeCuloare"
 
     @staticmethod
-    def verificaCareu(carti):
-        vectFrecv = [0]*15
+    def verifica_careu(carti):
+        vect_frecv = [0] * 15
 
         for iterator in carti:
-            vectFrecv[iterator[1]] += 1
+            vect_frecv[iterator[1]] += 1
 
-        if vectFrecv.count(4):
-            return (7, vectFrecv.index(4), "Careu")
+        if vect_frecv.count(4):
+            return 7, vect_frecv.index(4), "Careu"
 
     @staticmethod
-    def verificaFullHouse(carti):
-        vectFrecv = [0]*15
+    def verifica_fullhouse(carti):
+        vect_frecv = [0] * 15
         trei = None
         doi = None
 
         for iterator in carti:
-            vectFrecv[iterator[1]] += 1
-        vectFrecv[1] = 0
+            vect_frecv[iterator[1]] += 1
+        vect_frecv[1] = 0
 
-        for i in range(len(vectFrecv)-1, -1, -1):
-            if vectFrecv[i] == 3:
+        for i in range(len(vect_frecv) - 1, -1, -1):
+            if vect_frecv[i] == 3:
                 trei = i
                 break
         if trei is None:
             return
 
-        for i in range(len(vectFrecv)-1, -1, -1):
-            if vectFrecv[i] == 2:
+        for i in range(len(vect_frecv) - 1, -1, -1):
+            if vect_frecv[i] == 2:
                 doi = i
                 break
         if doi is None:
             return
 
-        return (6, trei, doi, "FullHouse")
+        return 6, trei, doi, "FullHouse"
 
     @staticmethod
-    def verificaCuloare(carti):
-        vectFrecvCulori = {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
-        vectMaxCulori = {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
+    def verifica_culoare(carti):
+        vect_frecv_culori = {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
+        vect_max_culori = {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
 
         for iterator in carti:
             if iterator[1] != 14:
-                vectFrecvCulori[iterator[0]] += 1
-            if iterator[1] > vectMaxCulori[iterator[0]]:
-                vectMaxCulori[iterator[0]] = iterator[1]
+                vect_frecv_culori[iterator[0]] += 1
+            if iterator[1] > vect_max_culori[iterator[0]]:
+                vect_max_culori[iterator[0]] = iterator[1]
 
-        for (it1, it2) in vectFrecvCulori.items():
+        for (it1, it2) in vect_frecv_culori.items():
             if it2 > 4:
-                return (5, vectMaxCulori[it1], "Culoare")
+                return 5, vect_max_culori[it1], "Culoare"
 
     @staticmethod
-    def verificaChinta(carti):
-        vectValori = []
+    def verifica_chinta(carti):
+        vect_valori = []
 
         for iterator in carti:
-            vectValori.append(iterator[1])
-        vectValori.sort()
+            vect_valori.append(iterator[1])
+        vect_valori.sort()
 
-        for i in range(len(vectValori) - 1, 3, -1):
-            if vectValori[i-1] == vectValori[i]-1 and vectValori[i-2] == vectValori[i]-2 and vectValori[i-3] == vectValori[i]-3 and vectValori[i-4] == vectValori[i]-4:
-                return (4, vectValori[i], "Chinta")
+        for index in range(len(vect_valori) - 1, 3, -1):
+            if vect_valori[index - 1] == vect_valori[index] - 1 and vect_valori[index - 2] == vect_valori[index] - 2 \
+                    and vect_valori[index - 3] == vect_valori[index] - 3 \
+                    and vect_valori[index - 4] == vect_valori[index] - 4:
+                return 4, vect_valori[index], "Chinta"
 
     @staticmethod
-    def verificaCui(carti):
-        vectFrecv = [0]*15
+    def verifica_cui(carti):
+        vect_frecv = [0] * 15
 
         for iterator in carti:
-            vectFrecv[iterator[1]] += 1
+            vect_frecv[iterator[1]] += 1
 
-        for i in range(len(vectFrecv) - 1, 0, -1):
-            if vectFrecv[i] == 3:
-                return (3, i, "Cui")
+        for i in range(len(vect_frecv) - 1, 0, -1):
+            if vect_frecv[i] == 3:
+                return 3, i, "Cui"
 
     @staticmethod
-    def verificaDouaPerechi(carti):
-        vectFrecv = [0]*15
+    def verifica_doua_perechi(carti):
+        vect_frecv = [0] * 15
         val1 = None
 
         for iterator in carti:
-            vectFrecv[iterator[1]] += 1
-        vectFrecv[1] = 0
+            vect_frecv[iterator[1]] += 1
+        vect_frecv[1] = 0
 
-        if vectFrecv.count(2) < 2:
+        if vect_frecv.count(2) < 2:
             return None
 
-        for i in range(len(vectFrecv)-1, -1, -1):
-            if vectFrecv[i] == 2 and val1 is None:
+        for i in range(len(vect_frecv) - 1, -1, -1):
+            if vect_frecv[i] == 2 and val1 is None:
                 val1 = i
-            elif vectFrecv[i] == 2:
-                return(2, val1, i, "DouaPerechi")
+            elif vect_frecv[i] == 2:
+                if val1 > i:
+                    return 2, val1, i, "DouaPerechi"
+                else:
+                    return 2, i, val1, "DouaPerechi"
 
-    def verificaPereche(self, carti):
-        vectFrecv = [0]*15
+    def verifica_pereche(self, carti):
+        vect_frecv = [0] * 15
 
         for iterator in carti:
-            vectFrecv[iterator[1]] += 1
-        vectFrecv[1] = 0
+            vect_frecv[iterator[1]] += 1
+        vect_frecv[1] = 0
 
+        if vect_frecv.count(2) > 0:
+            vect_frecv.reverse()
+            pereche = abs(vect_frecv.index(2) - 14)
+            if self.carte1[1] > self.carte2[1]:
+                if pereche == self.carte1[1]:
+                    kicker = self.carte2[1]
+                else:
+                    kicker = self.carte1[1]
+            else:
+                if pereche == self.carte2[1]:
+                    kicker = self.carte1[1]
+                else:
+                    kicker = self.carte2[1]
+            if kicker == 1:
+                kicker = 14
+            return 1, pereche, kicker, "Pereche"
+
+    def verifica_carte_mare(self):
+        if self.carte1[1] == 1:
+            self.carte1[1] == 14
+        if self.carte2[1] == 1:
+            self.carte2[1] == 14
         if self.carte1[1] > self.carte2[1]:
-            kicker = self.carte1
+            return 0, self.carte1[1], "CarteMare"
         else:
-            kicker = self.carte2
+            return 0, self.carte2[1], "CarteMare"
 
-        if vectFrecv.count(2) > 0:
-            vectFrecv.reverse()
-            return (1, abs(vectFrecv.index(2)-14), kicker[1], "Pereche")
+    def mana_maxima(self):
 
-    def verificaCarteMare(self):
-        if self.carte1[1] > self.carte2[1]:
-            return (self.carte1[1], "CarteMare")
-        else:
-            return (0, self.carte2[1], "CarteMare")
-
-    def manaMaxima(self):
-
-        manaJucator = self.cartiJucator()
-        if Poker.verificaChintaDeCuloare(manaJucator):
-            return Poker.verificaChintaDeCuloare(manaJucator)
-        if Poker.verificaCareu(manaJucator):
-            return Poker.verificaCareu(manaJucator)
-        if Poker.verificaFullHouse(manaJucator):
-            return Poker.verificaFullHouse(manaJucator)
-        if Poker.verificaCuloare(manaJucator):
-            return Poker.verificaCuloare(manaJucator)
-        if Poker.verificaChinta(manaJucator):
-            return Poker.verificaChinta(manaJucator)
-        if Poker.verificaCui(manaJucator):
-            return Poker.verificaCui(manaJucator)
-        if Poker.verificaDouaPerechi(manaJucator):
-            return Poker.verificaDouaPerechi(manaJucator)
-        if self.verificaPereche(manaJucator):
-            return self.verificaPereche(manaJucator)
-        if self.verificaCarteMare():
-            return self.verificaCarteMare()
+        mana_jucator = self.carti_jucator()
+        if Poker.verifica_chinta_de_culoare(mana_jucator):
+            return Poker.verifica_chinta_de_culoare(mana_jucator)
+        if Poker.verifica_careu(mana_jucator):
+            return Poker.verifica_careu(mana_jucator)
+        if Poker.verifica_fullhouse(mana_jucator):
+            return Poker.verifica_fullhouse(mana_jucator)
+        if Poker.verifica_culoare(mana_jucator):
+            return Poker.verifica_culoare(mana_jucator)
+        if Poker.verifica_chinta(mana_jucator):
+            return Poker.verifica_chinta(mana_jucator)
+        if Poker.verifica_cui(mana_jucator):
+            return Poker.verifica_cui(mana_jucator)
+        if Poker.verifica_doua_perechi(mana_jucator):
+            return Poker.verifica_doua_perechi(mana_jucator)
+        if self.verifica_pereche(mana_jucator):
+            return self.verifica_pereche(mana_jucator)
+        if self.verifica_carte_mare():
+            return self.verifica_carte_mare()
 
         print("Nu a gasit mana")
-        sys.exit
+
+    @staticmethod
+    def castigator(listaMaini):
+        listaCastigatori = []
+        listaMainiMaxime = []
+        maxim = -1
+        for iterator in listaMaini:
+            if iterator[0] > maxim:
+                maxim = iterator[0]
+                listaMainiMaxime.clear()
+                listaMainiMaxime.append(iterator)
+            elif iterator[0] == maxim:
+                listaMainiMaxime.append(iterator)
+        if maxim == 0:
+            carteMaxima = -1
+            for iterator in listaMainiMaxime:
+                if iterator[1] > carteMaxima:
+                    carteMaxima = iterator[1]
+            for iterator in listaMainiMaxime:
+                if iterator[1] == carteMaxima:
+                    listaCastigatori.append(iterator)
+        elif maxim == 1:
+            perecheMaxima = -1
+            for iterator in listaMainiMaxime:
+                if iterator[1] > perecheMaxima:
+                    listaCastigatori.clear()
+                    listaCastigatori.append(iterator)
+                    perecheMaxima = iterator[1]
+                elif iterator[1] == perecheMaxima:
+                    if iterator[2] > listaCastigatori[0][2]:
+                        listaCastigatori.clear()
+                        listaCastigatori.append(iterator)
+                    elif iterator[2] == listaCastigatori[0][2]:
+                        listaCastigatori.append(iterator)
+        elif maxim == 2:
+            perecheMaxima1 = -1
+            perecheMaxima2 = -1
+            for iterator in listaMainiMaxime:
+                if iterator[1] > perecheMaxima1:
+                    listaCastigatori.clear()
+                    listaCastigatori.append(iterator)
+                    perecheMaxima1 = iterator[1]
+                    perecheMaxima2 = iterator[2]
+                elif iterator[1] == perecheMaxima1:
+                    if iterator[2] > perecheMaxima2:
+                        listaCastigatori.clear()
+                        listaCastigatori.append(iterator)
+                        perecheMaxima2 = iterator[2]
+                    elif iterator[2] == perecheMaxima2:
+                        listaCastigatori.append(iterator)
+        elif maxim == 3:
+            carteMaxima = -1
+            for iterator in listaMainiMaxime:
+                if iterator[1] > carteMaxima:
+                    carteMaxima = iterator[1]
+            for iterator in listaMainiMaxime:
+                if iterator[1] == carteMaxima:
+                    listaCastigatori.append(iterator)
+        elif maxim == 4:
+            carteMaxima = -1
+            for iterator in listaMainiMaxime:
+                if iterator[1] > carteMaxima:
+                    carteMaxima = iterator[1]
+            for iterator in listaMainiMaxime:
+                if iterator[1] == carteMaxima:
+                    listaCastigatori.append(iterator)
+        elif maxim == 5:
+            carteMaxima = -1
+            for iterator in listaMainiMaxime:
+                if iterator[1] > carteMaxima:
+                    carteMaxima = iterator[1]
+            for iterator in listaMainiMaxime:
+                if iterator[1] == carteMaxima:
+                    listaCastigatori.append(iterator)
+        elif maxim == 6:
+            perecheMaxima1 = -1
+            perecheMaxima2 = -1
+            for iterator in listaMainiMaxime:
+                if iterator[1] > perecheMaxima1:
+                    listaCastigatori.clear()
+                    listaCastigatori.append(iterator)
+                    perecheMaxima1 = iterator[1]
+                    perecheMaxima2 = iterator[2]
+                elif iterator[1] == perecheMaxima1:
+                    if iterator[2] > perecheMaxima2:
+                        listaCastigatori.clear()
+                        listaCastigatori.append(iterator)
+                        perecheMaxima2 = iterator[2]
+                    elif iterator[2] == perecheMaxima2:
+                        listaCastigatori.append(iterator)
+        elif maxim == 7:
+            carteMaxima = -1
+            for iterator in listaMainiMaxime:
+                if iterator[1] > carteMaxima:
+                    carteMaxima = iterator[1]
+            for iterator in listaMainiMaxime:
+                if iterator[1] == carteMaxima:
+                    listaCastigatori.append(iterator)
+        elif maxim == 8:
+            carteMaxima = -1
+            for iterator in listaMainiMaxime:
+                if iterator[1] > carteMaxima:
+                    carteMaxima = iterator[1]
+            for iterator in listaMainiMaxime:
+                if iterator[1] == carteMaxima:
+                    listaCastigatori.append(iterator)
+        
+        return listaCastigatori
 
 
-for i in range(1, 30):
-    Poker.carteMasa1 = Poker.alegeCarteRandom()
-    Poker.carteMasa2 = Poker.alegeCarteRandom()
-    Poker.carteMasa3 = Poker.alegeCarteRandom()
-    Poker.carteMasa4 = Poker.alegeCarteRandom()
-    Poker.carteMasa5 = Poker.alegeCarteRandom()
+for i in range(1, 2):
+    Poker.carteMasa1 = Poker.alege_carte_random()
+    Poker.carteMasa2 = Poker.alege_carte_random()
+    Poker.carteMasa3 = Poker.alege_carte_random()
+    Poker.carteMasa4 = Poker.alege_carte_random()
+    Poker.carteMasa5 = Poker.alege_carte_random()
 
-    cul1, val1 = Poker.alegeCarteRandom()
-    cul2, val2 = Poker.alegeCarteRandom()
+    cul1, val1 = Poker.alege_carte_random()
+    cul2, val2 = Poker.alege_carte_random()
     jucator1 = Poker(cul1, val1, cul2, val2)
 
-    cul1, val1 = Poker.alegeCarteRandom()
-    cul2, val2 = Poker.alegeCarteRandom()
+    cul1, val1 = Poker.alege_carte_random()
+    cul2, val2 = Poker.alege_carte_random()
     jucator2 = Poker(cul1, val1, cul2, val2)
 
-    j1 = jucator1.manaMaxima()
-    j2 = jucator2.manaMaxima()
-    print(f"Carti Masa:{Poker.carteMasa1} {Poker.carteMasa2} {Poker.carteMasa3} {Poker.carteMasa4} {Poker.carteMasa5} \nCarti jucator1: {jucator1.carte1} {jucator1.carte2} \nCarti jucator2: {jucator2.carte1} {jucator2.carte2} \n")
-    print(f"Mana maxima Jucator1:{j1}\nMana maxima Jucator2:{j2}\n")
+    cul1, val1 = Poker.alege_carte_random()
+    cul2, val2 = Poker.alege_carte_random()
+    jucator3 = Poker(cul1, val1, cul2, val2)
 
-    Poker.reseteazaCartiFolosite()
+    cul1, val1 = Poker.alege_carte_random()
+    cul2, val2 = Poker.alege_carte_random()
+    jucator4 = Poker(cul1, val1, cul2, val2)
+    
 
+    j1 = jucator1.mana_maxima()
+    j2 = jucator2.mana_maxima()
+    j3 = jucator3.mana_maxima()
+    j4 = jucator4.mana_maxima()
+    
 
-''' Test Egalitate Random
-totalCuloare= {"inima": 0, "romb": 0, "frunza": 0, "trefla": 0}
-totalValori=[0]*14
-for i in range (1,100000):
-    Poker.carteMasa1=Poker.alegeCarteRandom()
-    totalCuloare[Poker.carteMasa1[0]]+=1
-    totalValori[Poker.carteMasa1[1]]+=1
-print(f"Inima: {totalCuloare['inima']}\nRomb: {totalCuloare['romb']}\nFrunza: {totalCuloare['frunza']}\nTrefla: {totalCuloare['trefla']}")
-contor=1
-for i in totalValori:
-    print(contor,end="  ")
-    contor+=1
-print('/n')
-for i in totalValori:
-    print(i,end=' ')
-'''
+    listaMainiMaxime = []
+    listaMainiMaxime.extend((j1, j2, j3, j4))
+    
+
+    print(f"Carti Masa:{Poker.carteMasa1} {Poker.carteMasa2} {Poker.carteMasa3} {Poker.carteMasa4} {Poker.carteMasa5} \nCarti jucator1: {jucator1.carte1} {jucator1.carte2} \nCarti jucator2: {jucator2.carte1} {jucator2.carte2} \nCarti jucator3: {jucator3.carte1} {jucator3.carte2} \nCarti jucator4: {jucator4.carte1} {jucator4.carte2} \n")
+    print(f"Mana maxima Jucator1:{j1}\nMana maxima Jucator2:{j2}\nMana maxima Jucator3:{j3}\nMana maxima Jucator4:{j4}\n")
+    
+    manaCastigatoare=Poker.castigator(listaMainiMaxime)
+    for iterator in manaCastigatoare:
+        castigator=listaMainiMaxime.index(iterator)
+        print(f"Jucatorul castigator este Jucator{castigator+1} cu mana {iterator}")
+
+    Poker.reseteaza_carti_folosite()

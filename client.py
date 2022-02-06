@@ -11,7 +11,7 @@ client_username = input("Username: ")
 client_username_send = client_username.encode("utf-8")
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((IP_ADDRESS, PORT))
-#s.setblocking(False)
+# s.setblocking(False)
 
 
 while True:
