@@ -2,7 +2,6 @@ import random
 
 
 class Poker:
-    listaCulori = ["inima", "romb", "trefla", "frunza"]
 
     carteMasa1 = ()
     carteMasa2 = ()
@@ -21,10 +20,11 @@ class Poker:
 
     @staticmethod
     def alege_carte_random():
-
+        listaCulori = ["inima", "romb", "trefla", "frunza"]
+        
         while True:
             valoare = random.randint(1, 13)
-            culoare = random.choice(Poker.listaCulori)
+            culoare = random.choice(listaCulori)
             if Poker.cartiFolosite.count((culoare, valoare)) == 0:
                 Poker.cartiFolosite.append((culoare, valoare))
                 return culoare, valoare
@@ -330,11 +330,11 @@ class Poker:
             for iterator in listaMainiMaxime:
                 if iterator[1] == carteMaxima:
                     listaCastigatori.append(iterator)
-        
+
         return listaCastigatori
 
 
-for i in range(1, 2):
+for i in range(1, 100):
     Poker.carteMasa1 = Poker.alege_carte_random()
     Poker.carteMasa2 = Poker.alege_carte_random()
     Poker.carteMasa3 = Poker.alege_carte_random()
@@ -356,24 +356,27 @@ for i in range(1, 2):
     cul1, val1 = Poker.alege_carte_random()
     cul2, val2 = Poker.alege_carte_random()
     jucator4 = Poker(cul1, val1, cul2, val2)
-    
 
     j1 = jucator1.mana_maxima()
     j2 = jucator2.mana_maxima()
     j3 = jucator3.mana_maxima()
     j4 = jucator4.mana_maxima()
-    
 
     listaMainiMaxime = []
     listaMainiMaxime.extend((j1, j2, j3, j4))
-    
 
     print(f"Carti Masa:{Poker.carteMasa1} {Poker.carteMasa2} {Poker.carteMasa3} {Poker.carteMasa4} {Poker.carteMasa5} \nCarti jucator1: {jucator1.carte1} {jucator1.carte2} \nCarti jucator2: {jucator2.carte1} {jucator2.carte2} \nCarti jucator3: {jucator3.carte1} {jucator3.carte2} \nCarti jucator4: {jucator4.carte1} {jucator4.carte2} \n")
-    print(f"Mana maxima Jucator1:{j1}\nMana maxima Jucator2:{j2}\nMana maxima Jucator3:{j3}\nMana maxima Jucator4:{j4}\n")
-    
-    manaCastigatoare=Poker.castigator(listaMainiMaxime)
-    for iterator in manaCastigatoare:
-        castigator=listaMainiMaxime.index(iterator)
-        print(f"Jucatorul castigator este Jucator{castigator+1} cu mana {iterator}")
+    print(
+        f"Mana maxima Jucator1:{j1}\nMana maxima Jucator2:{j2}\nMana maxima Jucator3:{j3}\nMana maxima Jucator4:{j4}\n")
 
+    print("Jucatorii castigatori sunt:", end=' ')
+    manaCastigatoare = Poker.castigator(listaMainiMaxime)
+    for iterator in manaCastigatoare:
+        castigator = listaMainiMaxime.index(iterator)
+        listaMainiMaxime.remove(iterator)
+        listaMainiMaxime.insert(castigator, -1)
+        print(
+            f"Jucator{castigator+1} cu mana {iterator},", end=' ')
+
+    print("\n\n")
     Poker.reseteaza_carti_folosite()
