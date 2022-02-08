@@ -2,26 +2,25 @@ import random
 
 
 class Poker:
-
     carteMasa1 = ()
     carteMasa2 = ()
     carteMasa3 = ()
     carteMasa4 = ()
     carteMasa5 = ()
 
-    carte1 = ()
-    carte2 = ()
+    carte1 = []
+    carte2 = []
 
     cartiFolosite = []
 
     def __init__(self, culoare1, valoare1, culoare2, valoare2):
-        self.carte1 = (culoare1, valoare1)
-        self.carte2 = (culoare2, valoare2)
+        self.carte1 = [culoare1, valoare1]
+        self.carte2 = [culoare2, valoare2]
 
     @staticmethod
     def alege_carte_random():
         listaCulori = ["inima", "romb", "trefla", "frunza"]
-        
+
         while True:
             valoare = random.randint(1, 13)
             culoare = random.choice(listaCulori)
@@ -33,11 +32,11 @@ class Poker:
     def reseteaza_carti_folosite():
         Poker.cartiFolosite.clear()
 
-    def carti_jucator(self):
+    def carti_jucator(self):  # returneaza o list cu toate cartile pe care le poate folosi un jucator
         total_carti_jucator = [Poker.carteMasa1, Poker.carteMasa2, Poker.carteMasa3, Poker.carteMasa4, Poker.carteMasa5,
                                self.carte1, self.carte2]
 
-        for iterator in total_carti_jucator:
+        for iterator in total_carti_jucator:  # trateaza asul ca fiind si 1 si 14
             if iterator[1] == 1:
                 total_carti_jucator.append((iterator[0], 14))
 
@@ -53,7 +52,7 @@ class Poker:
             if iterator[0] == "inima" or "romb" or "frunza" or "trefla" and iterator[1] != 14:
                 vect_frecv_culori[iterator[0]] += 1
 
-        for (it1, it2) in vect_frecv_culori.items():
+        for (it1, it2) in vect_frecv_culori.items():  # verifica daca exista cel putin 5 carti de aceeasi culoare
             if it2 > 4:
                 culoare = it1
         if culoare == 0:
@@ -64,7 +63,9 @@ class Poker:
                 vect_valori.append(iterator[1])
         vect_valori.sort()
 
-        for index in range(len(vect_valori) - 1, 3, -1):
+        for index in range(len(vect_valori) - 1, 3,
+                           -1):  # verifica daca acele carti formeaza o chinta si returneaza cea mai mare carte din
+            # acea chinta daca exista
             if vect_valori[index - 1] == vect_valori[index] - 1 and \
                     vect_valori[index - 2] == vect_valori[index] - 2 and vect_valori[index - 3] == \
                     vect_valori[index] - 3 and vect_valori[index - 4] == vect_valori[index] - 4:
@@ -78,7 +79,7 @@ class Poker:
             vect_frecv[iterator[1]] += 1
 
         if vect_frecv.count(4):
-            return 7, vect_frecv.index(4), "Careu"
+            return 7, vect_frecv.index(4), "Careu"  # returneaza cartea din care e format careul
 
     @staticmethod
     def verifica_fullhouse(carti):
@@ -90,21 +91,21 @@ class Poker:
             vect_frecv[iterator[1]] += 1
         vect_frecv[1] = 0
 
-        for i in range(len(vect_frecv) - 1, -1, -1):
-            if vect_frecv[i] == 3:
-                trei = i
+        for index in range(len(vect_frecv) - 1, -1, -1):  # verifica daca exista un cui
+            if vect_frecv[index] == 3:
+                trei = index
                 break
         if trei is None:
             return
 
-        for i in range(len(vect_frecv) - 1, -1, -1):
-            if vect_frecv[i] == 2:
-                doi = i
+        for index in range(len(vect_frecv) - 1, -1, -1):  # verifica daca exista si o pereche
+            if vect_frecv[index] == 2:
+                doi = index
                 break
         if doi is None:
             return
 
-        return 6, trei, doi, "FullHouse"
+        return 6, trei, doi, "FullHouse"  # returneaza cuiul si dupa perechea
 
     @staticmethod
     def verifica_culoare(carti):
@@ -119,7 +120,7 @@ class Poker:
 
         for (it1, it2) in vect_frecv_culori.items():
             if it2 > 4:
-                return 5, vect_max_culori[it1], "Culoare"
+                return 5, vect_max_culori[it1], "Culoare"  # returneaza cartea maxima din culoare
 
     @staticmethod
     def verifica_chinta(carti):
@@ -133,7 +134,7 @@ class Poker:
             if vect_valori[index - 1] == vect_valori[index] - 1 and vect_valori[index - 2] == vect_valori[index] - 2 \
                     and vect_valori[index - 3] == vect_valori[index] - 3 \
                     and vect_valori[index - 4] == vect_valori[index] - 4:
-                return 4, vect_valori[index], "Chinta"
+                return 4, vect_valori[index], "Chinta"  # returneaza cartea maxima din chinta
 
     @staticmethod
     def verifica_cui(carti):
@@ -142,9 +143,9 @@ class Poker:
         for iterator in carti:
             vect_frecv[iterator[1]] += 1
 
-        for i in range(len(vect_frecv) - 1, 0, -1):
-            if vect_frecv[i] == 3:
-                return 3, i, "Cui"
+        for index in range(len(vect_frecv) - 1, 0, -1):
+            if vect_frecv[index] == 3:
+                return 3, index, "Cui"  # returneaza cartea din care e format cuiul
 
     @staticmethod
     def verifica_doua_perechi(carti):
@@ -158,14 +159,14 @@ class Poker:
         if vect_frecv.count(2) < 2:
             return None
 
-        for i in range(len(vect_frecv) - 1, -1, -1):
-            if vect_frecv[i] == 2 and val1 is None:
-                val1 = i
-            elif vect_frecv[i] == 2:
-                if val1 > i:
-                    return 2, val1, i, "DouaPerechi"
+        for index in range(len(vect_frecv) - 1, -1, -1):
+            if vect_frecv[index] == 2 and val1 is None:
+                val1 = index
+            elif vect_frecv[index] == 2:
+                if val1 > index:
+                    return 2, val1, index, "DouaPerechi"
                 else:
-                    return 2, i, val1, "DouaPerechi"
+                    return 2, index, val1, "DouaPerechi"  # returneaza perechea mai mare si dupa cea mai mica
 
     def verifica_pereche(self, carti):
         vect_frecv = [0] * 15
@@ -189,19 +190,19 @@ class Poker:
                     kicker = self.carte2[1]
             if kicker == 1:
                 kicker = 14
-            return 1, pereche, kicker, "Pereche"
+            return 1, pereche, kicker, "Pereche"  # returneaza perechea si dupa kickerul
 
     def verifica_carte_mare(self):
         if self.carte1[1] == 1:
-            self.carte1[1] == 14
+            self.carte1[1] = 14
         if self.carte2[1] == 1:
-            self.carte2[1] == 14
+            self.carte2[1] = 14
         if self.carte1[1] > self.carte2[1]:
             return 0, self.carte1[1], "CarteMare"
         else:
-            return 0, self.carte2[1], "CarteMare"
+            return 0, self.carte2[1], "CarteMare"  # returneaza cartea cea mai mare din mana
 
-    def mana_maxima(self):
+    def mana_maxima(self):  # returneaza cea mai mare mana pe care o poate forma jucatorul
 
         mana_jucator = self.carti_jucator()
         if Poker.verifica_chinta_de_culoare(mana_jucator):
@@ -226,7 +227,7 @@ class Poker:
         print("Nu a gasit mana")
 
     @staticmethod
-    def castigator(listaMaini):
+    def castigator(listaMaini):  # returneaza castigatorul dintr-o lista de maini
         listaCastigatori = []
         listaMainiMaxime = []
         maxim = -1
@@ -365,9 +366,15 @@ for i in range(1, 100):
     listaMainiMaxime = []
     listaMainiMaxime.extend((j1, j2, j3, j4))
 
-    print(f"Carti Masa:{Poker.carteMasa1} {Poker.carteMasa2} {Poker.carteMasa3} {Poker.carteMasa4} {Poker.carteMasa5} \nCarti jucator1: {jucator1.carte1} {jucator1.carte2} \nCarti jucator2: {jucator2.carte1} {jucator2.carte2} \nCarti jucator3: {jucator3.carte1} {jucator3.carte2} \nCarti jucator4: {jucator4.carte1} {jucator4.carte2} \n")
-    print(
-        f"Mana maxima Jucator1:{j1}\nMana maxima Jucator2:{j2}\nMana maxima Jucator3:{j3}\nMana maxima Jucator4:{j4}\n")
+    print(f"Carti Masa:{Poker.carteMasa1} {Poker.carteMasa2} {Poker.carteMasa3} {Poker.carteMasa4} {Poker.carteMasa5}")
+    print(f"Carti jucator1: {jucator1.carte1} {jucator1.carte2}")
+    print(f"Carti jucator2: {jucator2.carte1} {jucator2.carte2}")
+    print(f"Carti jucator3: {jucator3.carte1} {jucator3.carte2}")
+    print(f"Carti jucator4: {jucator4.carte1} {jucator4.carte2}\n")
+    print(f"Mana maxima Jucator1:{j1}")
+    print(f"Mana maxima Jucator2:{j2}")
+    print(f"Mana maxima Jucator3:{j3}")
+    print(f"Mana maxima Jucator4:{j4}\n")
 
     print("Jucatorii castigatori sunt:", end=' ')
     manaCastigatoare = Poker.castigator(listaMainiMaxime)
@@ -375,8 +382,7 @@ for i in range(1, 100):
         castigator = listaMainiMaxime.index(iterator)
         listaMainiMaxime.remove(iterator)
         listaMainiMaxime.insert(castigator, -1)
-        print(
-            f"Jucator{castigator+1} cu mana {iterator},", end=' ')
+        print(f"Jucator{castigator + 1} cu mana {iterator},", end=' ')
 
     print("\n\n")
     Poker.reseteaza_carti_folosite()
