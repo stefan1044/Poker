@@ -1,39 +1,82 @@
-import socket
 import pickle
+import socket
+import pygame
+from network import Network
+from poker import Poker
+
+width = 1280
+height = 1024
+win = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Client")
+
+clinetNumber = 0
+
+carteStanga = []
+carteDreapta = []
 
 
-IP_ADDRESS = "127.0.0.1"
-PORT = 1234
+def redraw_window(win):
+    win.fill((50, 200, 100))
 
-HEADER_SIZE = 10
+    if carteStanga[0] == "inima":
+        imagineStanga = pygame.image.load("pokerheart.png")
+    elif carteStanga[0] == "romb":
+        imagineStanga = pygame.image.load("pokerdiamond.png")
+    elif carteStanga[0] == "trefla":
+        imagineStanga = pygame.image.load("pokerclub.png")
+    elif carteStanga[0] == "frunza":
+        imagineStanga = pygame.image.load("pokerspade.png")
+    
+    if carteDreapta[0] == "inima":
+        imagineDreapta = pygame.image.load("pokerheart.png")
+    elif carteDreapta[0] == "romb":
+        imagineDreapta = pygame.image.load("pokerdiamond.png")
+    elif carteDreapta[0] == "trefla":
+        imagineDreapta = pygame.image.load("pokerclub.png")
+    elif carteDreapta[0] == "frunza":
+        imagineDreapta = pygame.image.load("pokerspade.png")
+        
+    imgS=imagineStanga.get_rect()
+    imgD=imagineDreapta.get_rect()
+    
+    imgS1=imgS.move((340,768))
+    imgD1=imgD.move((740,768))
+    imgS2=imgS.move((440,924))
+    imgD2=imgD.move((840,924))
+    
+    imagineStanga=pygame.transform.scale(imagineStanga,(100,100))
+    imagineDreapta= pygame.transform.scale(imagineDreapta,(100,100))
+    
+    win.blit(imagineStanga,imgS1)
+    win.blit(imagineDreapta,imgD1)
+    win.blit(imagineStanga,imgS2)
+    win.blit(imagineDreapta,imgD2)
+    
+    pygame.display.update()
 
-client_username = input("Username: ")
-client_username_send = client_username.encode("utf-8")
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((IP_ADDRESS, PORT))
-# s.setblocking(False)
+
+def main():
+    run = True
+    n = Network()
+    startPos = n.getPos()
+    print(f"start pos {startPos}")
+    clock = pygame.time.Clock()
+    carteStanga.append("trefla")
+    carteStanga.append(3)
+    carteDreapta.append("romb")
+    carteDreapta.append(11)
+
+    while run:
+        clock.tick(60)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+        keypress = pygame.key.get_pressed()
+        if keypress[pygame.K_ESCAPE]:
+            pygame.quit()
+        redraw_window(win)
 
 
-while True:
-
-    full_msg = b""
-    new_msg = True
-    while True:
-        msg = s.recv(16)
-        if new_msg:
-            print(f"new message length: {msg[:HEADER_SIZE]}")
-            msglen = int(msg[:HEADER_SIZE])
-            new_msg = False
-
-        full_msg += msg
-
-        if len(full_msg) - HEADER_SIZE == msglen:
-            print("full msg recived")
-            print(full_msg[HEADER_SIZE:])
-
-            d = pickle.loads(full_msg[HEADER_SIZE:])
-            print(d)
-
-            new_msg = True
-            full_msg = b''
-    print(full_msg)
+main()

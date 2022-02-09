@@ -1,23 +1,48 @@
 import socket
 import select
 import pickle
+import _thread 
+from poker import Poker
 
-IP_ADDRESS = "127.0.0.1"
-PORT = 1234
-HEADERSIZE = 10
 
+SERVER = "192.168.100.3"
+PORT = 5555
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind((IP_ADDRESS, PORT))
-s.listen(5)
+
+
+try:
+    s.bind((SERVER, PORT))
+except socket.error as e:
+    print(e)
+
+
+s.listen(9)
+print("Waiting for connections, Server Started")
+
+def threaded_client(clientConnection):
+    clientConnection.send(str.encode("Connected"))
+    reply=""
+    while True:
+        try:
+            data=clientConnection.recv(2048)
+            reply=data.decode("utf-8")
+            
+            if not data:
+                print ("Disconnected")
+                break
+            else:
+                print(f"Received: {reply}")
+                print(f"Sending: {reply}")
+            
+            clientConnection.sendall(str.encode(reply))
+        except:
+            break
+    
+    print("Lost connection")
+    clientConnection.close()
 
 while True:
-    clientsocket, address = s.accept()
-    print(f"Connection established from {address}")
-
-    d = {1: "Hey", 2: "There"}
-    msg = pickle.dumps(d)
-
-    msg = bytes(f"{len(msg): < {HEADERSIZE}}", "utf-8") + msg
-
-    clientsocket.send(msg)
+    clientConnection, clientAddress=s.accept()
+    print (f"Connected to: {clientAddress}")
+    
+    _thread.start_new_thread(threaded_client, (clientConnection,))
